@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
 
 public class Main {
@@ -29,36 +26,58 @@ public class Main {
                 int linesCount = 0;
                 int longestLength = 0;
                 int shortestLength = Integer.MAX_VALUE;
+                int googleBotRequests = 0;
+                int yandexBotRequests = 0;
 
                 FileReader fileReader = new FileReader(path);
                 BufferedReader reader = new BufferedReader(fileReader);
                 String line;
+
                 while ((line = reader.readLine()) != null) {
                     int length = line.length();
                     linesCount++;
                     longestLength = Math.max(longestLength, length);
                     shortestLength = Math.min(shortestLength, length);
 
-                    if (length > 1024) {
-                        throw new Main.LineTooLongException("Строка содержит более 1024 символов.");
+
+                        if (!line.contains("(compatible") || !line.contains(")")) {
+                            continue;
+                        }
+
+                    String firstBrackets = line.substring(line.indexOf("(compatible") + 1);
+                    String[] parts = firstBrackets.split(";");
+
+                    if (parts.length >= 2) {
+                        String fragment = parts[1];
+                        fragment = fragment.replaceAll("\s+", "");
+                        if (!fragment.contains("/")) {
+                            continue;
+                        }
+                        String finalFragment = fragment.substring(0, fragment.indexOf("/"));
+
+
+                        if (finalFragment.equals("Googlebot")) {
+                            googleBotRequests++;
+                        } else if (finalFragment.equals("YandexBot")) {
+                            yandexBotRequests++;
+                        }
                     }
                 }
+
                 reader.close();
 
                 System.out.println("Общее количество строк в файле: " + linesCount);
                 System.out.println("Длина самой длинной строки в файле: " + longestLength);
                 System.out.println("Длина самой короткой строки в файле: " + shortestLength);
 
+                System.out.println("Количество запросов от YandexBot: " + yandexBotRequests);
+                System.out.println("Количество запросов от GoogleBot: " + googleBotRequests);
+
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (Main.LineTooLongException e) {
-                e.printStackTrace();
             }
-        }
-    }
-    static class LineTooLongException extends RuntimeException {
-        public LineTooLongException(String message) {
-            super(message);
+
+
         }
     }
 }
