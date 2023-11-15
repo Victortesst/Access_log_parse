@@ -1,9 +1,12 @@
+import ru.courses.access_log_parser.LogEntry;
+import ru.courses.access_log_parser.Statistics;
 import java.io.*;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         int fileCount = 0;
+        Statistics statistics = new Statistics();
 
         while (true) {
             System.out.print("Введите путь до файла: ");
@@ -39,6 +42,9 @@ public class Main {
                     longestLength = Math.max(longestLength, length);
                     shortestLength = Math.min(shortestLength, length);
 
+                    LogEntry logEntry = new LogEntry(line);
+
+                     statistics.addEntry(logEntry);
 
                         if (!line.contains("(compatible") || !line.contains(")")) {
                             continue;
@@ -66,6 +72,7 @@ public class Main {
 
                 reader.close();
 
+                System.out.println("Колличество трафика в час = " + statistics.getTrafficRate());
                 System.out.println("Общее количество строк в файле: " + linesCount);
                 System.out.println("Длина самой длинной строки в файле: " + longestLength);
                 System.out.println("Длина самой короткой строки в файле: " + shortestLength);
