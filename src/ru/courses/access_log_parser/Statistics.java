@@ -16,6 +16,10 @@ public class Statistics {
 
     private HashMap<String, Integer> osCount;
 
+    private HashSet<String> badPages;
+
+    private HashMap<String, Integer> browserCount;
+
     public Statistics() {
         totalTraffic = 0;
         minTime = null;
@@ -23,6 +27,8 @@ public class Statistics {
         logEntries = new ArrayList<>();
         pages = new HashSet<>();
         osCount = new HashMap<>();
+        badPages = new HashSet<>();
+        browserCount = new HashMap<>();
     }
 
     public void addEntry(LogEntry entry) {
@@ -39,6 +45,8 @@ public class Statistics {
 
         if (entry.getResponseCode() == 200) {
             pages.add(entry.getPath());
+        } else if(entry.getResponseCode() == 404)
+            badPages.add(entry.getPath());
 
             UserAgent userAgent = new UserAgent(entry.getUserAgent());
             if (osCount.containsKey(userAgent.getOperatingSystem())) {
@@ -46,8 +54,13 @@ public class Statistics {
             } else {
                 osCount.put(userAgent.getOperatingSystem(), 1);
             }
+
+        if (browserCount.containsKey(userAgent.getBrowser())) {
+            browserCount.put(userAgent.getBrowser(), browserCount.get(userAgent.getBrowser()) + 1);
+        } else {
+            browserCount.put(userAgent.getBrowser(), 1);
         }
-    }
+        }
 
 
     public double getTrafficRate() {
@@ -67,6 +80,10 @@ public class Statistics {
         return pages;
     }
 
+    public HashSet<String> getAllBadPages() {
+        return badPages;
+    }
+
     public HashMap<String, Double> getOSStatistics() {
         HashMap<String, Double> osStatistics = new HashMap<>();
         int total = 0;
@@ -81,5 +98,21 @@ public class Statistics {
         }
 
         return osStatistics;
+    }
+
+    public HashMap<String, Double> getBrowserStatistics() {
+        HashMap<String, Double> browserStatistics = new HashMap<>();
+        int total = 0;
+
+        for (int count : browserCount.values()) {
+            total += count;
+        }
+
+        for (String os : browserCount.keySet()) {
+            double percentage = (double) browserCount.get(os) / total;
+            browserStatistics.put(os, percentage);
+        }
+
+        return browserStatistics;
     }
 }
