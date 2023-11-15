@@ -71,7 +71,8 @@ public class Main {
                 }
 
                 reader.close();
-
+                System.out.println(statistics.getAllPages());
+                System.out.println(statistics.getOSStatistics());
                 System.out.println("Колличество трафика в час = " + statistics.getTrafficRate());
                 System.out.println("Общее количество строк в файле: " + linesCount);
                 System.out.println("Длина самой длинной строки в файле: " + longestLength);
