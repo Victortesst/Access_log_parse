@@ -1,13 +1,16 @@
 package ru.courses.access_log_parser;
+
 public class UserAgent {
     private final String operatingSystem;
     private final String browser;
+    private final boolean isBot;
 
     public UserAgent(String userAgentString) {
         String[] components = userAgentString.split(" ");
 
         operatingSystem = getOperatingSystem(components);
         browser = getBrowser(components);
+        isBot = userAgentString.contains("bot");
     }
 
     public String getOperatingSystem() {
@@ -16,6 +19,10 @@ public class UserAgent {
 
     public String getBrowser() {
         return browser;
+    }
+
+    public boolean isBot() {
+        return isBot;
     }
 
     private String getOperatingSystem(String[] components) {
@@ -41,8 +48,7 @@ public class UserAgent {
 
     private String getBrowser(String[] components) {
 
-
-      String  browserToken = components[components.length-1];
+        String browserToken = components[components.length - 1];
 
         if (browserToken.contains("Edge")) {
             return "Edge";
