@@ -172,4 +172,66 @@ public class Statistics {
         return (double) (totalVisitsByRealUsers - botCount) / uniqueIPs.size();
     }
 
+    public double getPeakVisitsPerSecond() {
+        HashMap<LocalDateTime, Integer> visitsPerSecond = new HashMap<>();
+
+        for (LogEntry entry : logEntries) {
+            if (!entry.getUserAgent().contains("bot")) {
+                LocalDateTime dateTime = entry.getDateTime();
+
+                if (visitsPerSecond.containsKey(dateTime)) {
+                    visitsPerSecond.put(dateTime, visitsPerSecond.get(dateTime) + 1);
+                } else {
+                    visitsPerSecond.put(dateTime, 1);
+                }
+            }
+        }
+
+        int maxVisits = 0;
+        for (int count : visitsPerSecond.values()) {
+            if (count > maxVisits) {
+                maxVisits = count;
+            }
+        }
+
+        return maxVisits;
+    }
+
+    public HashSet<String> getSitesWithLinks() {
+        HashSet<String> sitesWithLinks = new HashSet<>();
+
+        for (LogEntry entry : logEntries) {
+            if (entry.getReferer().length() > 3) {
+                String referer = entry.getReferer();
+                String domain = referer.split("/")[2];
+                sitesWithLinks.add(domain);
+            }
+        }
+
+        return sitesWithLinks;
+    }
+
+    public int getMaxVisitsByUser() {
+        HashMap<String, Integer> visitsByUser = new HashMap<>();
+
+        for (LogEntry entry : logEntries) {
+            String ipAddress = entry.getIpAddress();
+            if (!entry.getUserAgent().contains("bot")) {
+                if (visitsByUser.containsKey(ipAddress)) {
+                    visitsByUser.put(ipAddress, visitsByUser.get(ipAddress) + 1);
+                } else {
+                    visitsByUser.put(ipAddress, 1);
+                }
+            }
+        }
+
+        int maxVisits = 0;
+        for (int count : visitsByUser.values()) {
+            if (count > maxVisits) {
+                maxVisits = count;
+            }
+        }
+
+        return maxVisits;
+    }
 }
